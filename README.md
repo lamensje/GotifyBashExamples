@@ -1,6 +1,6 @@
 # GotifyBashExamples
 
-Zpool status
+zpool status
 ```
 GOTIFY_URL="http://<your_gotify_server_ip>:9080"
 GOTIFY_TOKEN="your_token"
