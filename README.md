@@ -1,4 +1,4 @@
-# GotifyBashExamples
+# Gotify Bash Examples
 
 zpool status
 ```
