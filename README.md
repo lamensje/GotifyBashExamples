@@ -53,7 +53,7 @@ do
 
  MSG_TITLE="smartctl on $HOST with CPU $CPU"
  MSG_BODY="$MODEL_SERIAL$NL$NL$OVERALL_HEALTH$NL$NL$SMART"
- curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` "
+ curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
 done
 
 for nvme in /dev/nvme0n?
@@ -63,6 +63,6 @@ do
 
  MSG_TITLE="smartctl on $HOST with CPU $CPU"
  MSG_BODY="$MODEL_SERIAL$NL$NL$SMART"
- curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` "
+ curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
 done
 ```
