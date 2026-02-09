@@ -47,9 +47,9 @@ NL=$'\n'
 
 for disk in /dev/sd?
 do
- MODEL_SERIAL=$(smartctl -i $disk | grep 'Model\|Serial' | grep -v "Family")
- OVERALL_HEALTH=$(smartctl -a $disk | grep "overall-health")
- SMART=$(smartctl -A -f brief $disk | awk '/Attributes/{found=1; next} found' | awk '/Error Log/{exit} {print}' |  grep -v "|" | sed -Ee 's/\S+/\n&/2;s/.*\n//' | sed -r 's/\S+//2')
+ MODEL_SERIAL=$(/usr/sbin/smartctl -i $disk | grep 'Model\|Serial' | grep -v "Family")
+ OVERALL_HEALTH=$(/usr/sbin/smartctl -a $disk | grep "overall-health")
+ SMART=$(/usr/sbin/smartctl -A -f brief $disk | awk '/Attributes/{found=1; next} found' | awk '/Error Log/{exit} {print}' |  grep -v "|" | sed -Ee 's/\S+/\n&/2;s/.*\n//' | sed -r 's/\S+//2')
 
  MSG_TITLE="smartctl on $HOST with CPU $CPU"
  MSG_BODY="$MODEL_SERIAL$NL$NL$OVERALL_HEALTH$NL$NL$SMART"
@@ -58,11 +58,17 @@ done
 
 for nvme in /dev/nvme0n?
 do
- MODEL_SERIAL=$(smartctl -i $nvme | grep 'Model\|Serial' | grep -v "Family")
- SMART=$(smartctl -a $nvme | awk '/SMART DATA SECTION/{found=1; next} found' | awk '/Error Information/{exit} {print}')
+ MODEL_SERIAL=$(/usr/sbin/smartctl -i $nvme | grep 'Model\|Serial' | grep -v "Family")
+ SMART=$(/usr/sbin/smartctl -a $nvme | awk '/SMART DATA SECTION/{found=1; next} found' | awk '/Error Information/{exit} {print}')
 
  MSG_TITLE="smartctl on $HOST with CPU $CPU"
  MSG_BODY="$MODEL_SERIAL$NL$NL$SMART"
  curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
 done
+```
+
+cronjob
+```
+#Runs every 2nd monday of the month at 9:00 (after first sunday of the month, default ZFS scrub on Proxmox)
+0 9 * * MON#2 /bin/bash /root/smartctl.sh 2>&1 /dev/null
 ```
