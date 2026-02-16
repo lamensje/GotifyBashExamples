@@ -42,7 +42,7 @@ GOTIFY_URL="http://<your_gotify_server_ip>:9080"
 GOTIFY_TOKEN="your_token"
 
 HOST=$(hostname)
-CPU=$(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')
+CPU=$(lscpu | grep 'Model name' | grep -v 'BIOS' | cut -f 2 -d ":" | awk '{$1=$1}1')
 NL=$'\n'
 
 for disk in /dev/sd?
