@@ -42,7 +42,7 @@ GOTIFY_URL="http://<your_gotify_server_ip>:9080"
 GOTIFY_TOKEN="your_token"
 
 HOST=$(hostname)
-CPU=$(lscpu | grep 'Model name' | grep -v 'BIOS' | cut -f 2 -d ":" | awk '{$1=$1}1')
+CPU=$(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')
 NL=$'\n'
 
 for disk in /dev/sd?
@@ -51,9 +51,12 @@ do
  OVERALL_HEALTH=$(/usr/sbin/smartctl -a $disk | grep "overall-health")
  SMART=$(/usr/sbin/smartctl -A -f brief $disk | awk '/Attributes/{found=1; next} found' | awk '/Error Log/{exit} {print}' |  grep -v "|" | sed -Ee 's/\S+/\n&/2;s/.*\n//' | sed -r 's/\S+//2')
 
- MSG_TITLE="smartctl on $HOST with CPU $CPU"
- MSG_BODY="$MODEL_SERIAL$NL$NL$OVERALL_HEALTH$NL$NL$SMART"
- curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
+ if [[ $SMART ]]
+  then
+   MSG_TITLE="smartctl on $HOST with CPU $CPU"
+   MSG_BODY="$MODEL_SERIAL$NL$NL$OVERALL_HEALTH$NL$NL$SMART"
+   curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
+  fi
 done
 
 for nvme in /dev/nvme0n?
@@ -61,9 +64,12 @@ do
  MODEL_SERIAL=$(/usr/sbin/smartctl -i $nvme | grep 'Model\|Serial' | grep -v "Family")
  SMART=$(/usr/sbin/smartctl -a $nvme | awk '/SMART DATA SECTION/{found=1; next} found' | awk '/Error Information/{exit} {print}')
 
- MSG_TITLE="smartctl on $HOST with CPU $CPU"
- MSG_BODY="$MODEL_SERIAL$NL$NL$SMART"
- curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
+ if [[ $SMART ]]
+  then
+   MSG_TITLE="smartctl on $HOST with CPU $CPU"
+   MSG_BODY="$MODEL_SERIAL$NL$NL$SMART"
+   curl "${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}" -F "title=${MSG_TITLE}" -F "message=\`\`\`$MSG_BODY\`\`\` " &> /dev/null
+  fi
 done
 ```
 
