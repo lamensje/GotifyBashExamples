@@ -59,7 +59,7 @@ do
   fi
 done
 
-for nvme in /dev/nvme0n?
+for nvme in /dev/nvme?n1
 do
  MODEL_SERIAL=$(/usr/sbin/smartctl -i $nvme | grep 'Model\|Serial' | grep -v "Family")
  SMART=$(/usr/sbin/smartctl -a $nvme | awk '/SMART DATA SECTION/{found=1; next} found' | awk '/Error Information/{exit} {print}')
